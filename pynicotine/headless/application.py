@@ -29,6 +29,10 @@ from pynicotine.search import Searches
 import socket 
 import json
 import requests
+from dotenv import load_dotenv
+
+
+load_dotenv()
 class Application:
 
     def __init__(self):
@@ -53,7 +57,7 @@ class Application:
                 core.search.do_search(search_term, "global")
             
     def status_message(self, status,core):
-        url = "http://localhost:8002/status_message"
+        url = f"http://{os.environ['API_HOST']}:{os.environ['API_PORT']}/status_message"
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         token = core.search.token
         params={"search_term":core.search.searches[token].term, "status":status}
