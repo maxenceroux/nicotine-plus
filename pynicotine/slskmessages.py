@@ -793,12 +793,12 @@ class FileSearch(ServerMessage):
 
         if text:
             self.searchterm = " ".join(x for x in text.split() if x != "-")
-
+        print(f"FileSearch text:{text}")
     def make_network_message(self):
         msg = bytearray()
         msg.extend(self.pack_uint32(self.token))
         msg.extend(self.pack_string(self.searchterm, is_legacy=True))
-
+        
         return msg
 
     def parse_network_message(self, message):
@@ -2696,7 +2696,6 @@ class FileSearchResponse(FileListMessage):
         self.inqueue = inqueue
         self.fifoqueue = fifoqueue
         self.unknown = 0
-
     def make_network_message(self):
         msg = bytearray()
         msg.extend(self.pack_string(self.user))

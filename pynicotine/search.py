@@ -51,13 +51,13 @@ class Search:
 class Searches:
 
     def __init__(self):
-
         self.searches = {}
         self.token = int(random.random() * (2 ** 31 - 1))
         self.wishlist_interval = 0
         self._wishlist_timer_id = None
 
         # Create wishlist searches
+        print(config.sections["server"])
         for term in config.sections["server"]["autosearch"]:
             self.token = slskmessages.increment_token(self.token)
             self.searches[self.token] = Search(token=self.token, term=term, mode="wishlist", is_ignored=True)
@@ -201,13 +201,11 @@ class Searches:
         return search_term, search_term_without_special, room, users
 
     def do_search(self, search_term, mode, room=None, user=None, switch_page=True):
-
         # Validate search term and run it through plugins
         search_term, _search_term_without_special, room, users = self.process_search_term(search_term, mode, room, user)
 
         # Get a new search token
         self.token = slskmessages.increment_token(self.token)
-
         if config.sections["searches"]["enable_history"]:
             items = config.sections["searches"]["history"]
 
@@ -215,7 +213,6 @@ class Searches:
                 items.remove(search_term)
 
             items.insert(0, search_term)
-
             # Clear old items
             del items[200:]
             config.write_configuration()
@@ -236,6 +233,7 @@ class Searches:
         events.emit("add-search", search.token, search, switch_page)
 
     def do_global_search(self, text):
+        print(f"search_token:{self.token}")
         core.queue.append(slskmessages.FileSearch(self.token, text))
 
         """ Request a list of related searches from the server.
@@ -336,7 +334,20 @@ class Searches:
 
     def _file_search_response(self, msg):
         """ Peer message: 9 """
-
+        with open(f'pynicotine/search_results/{msg.token}.csv', 'a+') as f:
+            f.write(f'{msg.user}|{msg.freeulslots}|{msg.ulspeed}|{msg.inqueue}\n')
+        with open(f'pynicotine/search_results/{msg.user}_{msg.token}.csv', 'a+') as f:
+            for item in msg.list:
+                
+                try:
+                    bitrate = item[-1][0]
+                except:
+                    bitrate = None
+                try: 
+                    duration = f"{item[-1][1]% 3600 // 60}:{item[-1][1]%3600%60}"
+                except: 
+                    duration=None
+                f.write(f"{item[0]}|{item[1]}|{item[2]}|{item[3]}|{bitrate}|{duration}\n")
         if msg.token not in slskmessages.SEARCH_TOKENS_ALLOWED:
             msg.token = None
             return
@@ -359,13 +370,11 @@ class Searches:
 
     def _file_search_request_server(self, msg):
         """ Server code: 26, 42 and 120 """
-
         self.process_search_request(msg.searchterm, msg.user, msg.token, direct=True)
         core.pluginhandler.search_request_notification(msg.searchterm, msg.user, msg.token)
 
     def _file_search_request_distributed(self, msg):
         """ Distrib code: 3 """
-
         self.process_search_request(msg.searchterm, msg.user, msg.token, direct=False)
         core.pluginhandler.distrib_search_notification(msg.searchterm, msg.user, msg.token)
 
@@ -449,7 +458,7 @@ class Searches:
     def process_search_request(self, searchterm, user, token, direct=False):
         """ Note: since this section is accessed every time a search request arrives several
             times per second, please keep it as optimized and memory sparse as possible! """
-
+        # DES QU'IL Y A UNE DEMANDE UTILISATEUR 
         if not searchterm:
             return
 
