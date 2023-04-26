@@ -34,7 +34,6 @@ import os
 import signal
 import sys
 import threading
-
 from collections import deque
 
 from pynicotine import slskmessages
@@ -49,6 +48,7 @@ class Core:
     This class links the networking thread and user interface. """
 
     def __init__(self):
+        
 
         self.network_filter = None
         self.statistics = None
@@ -104,7 +104,6 @@ class Core:
             ("watch-user", self._watch_user)
         ):
             events.connect(event_name, callback)
-
     def init_components(self, enable_cli=False):
 
         from pynicotine.chatrooms import ChatRooms
@@ -227,7 +226,8 @@ class Core:
         log.close_log_files()
 
     def connect(self):
-
+        config.sections["server"]["login"]=os.environ["SOULSEEK_USERNAME"]
+        config.sections["server"]["passw"]=os.environ["SOULSEEK_PASSWORD"]
         if config.need_config():
             log.add(_("You need to specify a username and password before connecting…"))
             self.setup()

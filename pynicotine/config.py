@@ -40,7 +40,9 @@ from pynicotine.i18n import apply_translations
 from pynicotine.utils import encode_path
 from pynicotine.utils import load_file
 from pynicotine.utils import write_file_and_backup
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class Config:
     """
@@ -164,8 +166,8 @@ class Config:
         self.defaults = {
             "server": {
                 "server": ("server.slsknet.org", 2242),
-                "login": "",
-                "passw": "",
+                "login": os.environ["SOULSEEK_USERNAME"],
+                "passw": os.environ["SOULSEEK_PASSWORD"],
                 "interface": "",
                 "ctcpmsgs": False,
                 "autosearch": [],
@@ -186,9 +188,9 @@ class Config:
                 "command_aliases": {}
             },
             "transfers": {
-                "incompletedir": os.path.join(self.data_dir, "incomplete"),
-                "downloaddir": os.path.join(self.data_dir, "downloads"),
-                "uploaddir": os.path.join(self.data_dir, "received"),
+                "incompletedir": os.environ["INCOMPLETE_FOLDER"],
+                "downloaddir": os.environ["COMPLETE_FOLDER"],
+                "uploaddir": os.environ["COMPLETE_FOLDER"],
                 "usernamesubfolders": False,
                 "shared": [],
                 "buddyshared": [],
