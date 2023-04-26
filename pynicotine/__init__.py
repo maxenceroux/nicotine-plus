@@ -202,7 +202,9 @@ def run():
         log.add(f"Faulthandler module could not be enabled. Error: {error}")
 
     core.init_components(enable_cli=True)
-
+    config.sections["transfers"]["downloaddir"] =os.environ["COMPLETE_FOLDER"]
+    config.sections["transfers"]["uploaddir"] =os.environ["COMPLETE_FOLDER"]
+    config.sections["transfers"]["incompletedir"] =os.environ["INCOMPLETE_FOLDER"]
     if not os.path.isdir(LOCALE_PATH):
         log.add("Translation files (.mo) are unavailable, using default English strings")
 

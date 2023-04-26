@@ -50,7 +50,8 @@ class Application:
 
     def auto_search(self, search_term,  core):
         for f in os.listdir("pynicotine/search_results"):
-            os.remove(f"pynicotine/search_results/{f}")
+            if f != "__init__.py":
+                os.remove(f"pynicotine/search_results/{f}")
         searched=False
         if core.user_status==2:
             if not searched:
@@ -109,7 +110,9 @@ class Application:
             print("Not found")   
             self.status_message("criterias_not_met",core)         
         for f in os.listdir("pynicotine/search_results"):
-            os.remove(f"pynicotine/search_results/{f}")
+            if f != "__init__.py":
+                os.remove(f"pynicotine/search_results/{f}")
+
 
     def run(self):
         core.start()
