@@ -334,39 +334,40 @@ class Searches:
 
     def _file_search_response(self, msg):
         """ Peer message: 9 """
-        with open(f'pynicotine/search_results/{msg.token}.csv', 'a+') as f:
-            f.write(f'{msg.user}|{msg.freeulslots}|{msg.ulspeed}|{msg.inqueue}\n')
-        with open(f'pynicotine/search_results/{msg.user}_{msg.token}.csv', 'a+') as f:
-            for item in msg.list:
-                
-                try:
-                    bitrate = item[-1][0]
-                except:
-                    bitrate = None
-                try: 
-                    duration = f"{item[-1][1]% 3600 // 60}:{item[-1][1]%3600%60}"
-                except: 
-                    duration=None
-                f.write(f"{item[0]}|{item[1]}|{item[2]}|{item[3]}|{bitrate}|{duration}\n")
-        if msg.token not in slskmessages.SEARCH_TOKENS_ALLOWED:
-            msg.token = None
-            return
+        if "/" not in msg.user:
+            with open(f'pynicotine/search_results/{msg.token}.csv', 'a+') as f:
+                f.write(f'{msg.user}|{msg.freeulslots}|{msg.ulspeed}|{msg.inqueue}\n')
+            with open(f'pynicotine/search_results/{msg.user}_{msg.token}.csv', 'a+') as f:
+                for item in msg.list:
+                    
+                    try:
+                        bitrate = item[-1][0]
+                    except:
+                        bitrate = None
+                    try: 
+                        duration = f"{item[-1][1]% 3600 // 60}:{item[-1][1]%3600%60}"
+                    except: 
+                        duration=None
+                    f.write(f"{item[0]}|{item[1]}|{item[2]}|{item[3]}|{bitrate}|{duration}\n")
+            if msg.token not in slskmessages.SEARCH_TOKENS_ALLOWED:
+                msg.token = None
+                return
 
-        search = self.searches.get(msg.token)
+            search = self.searches.get(msg.token)
 
-        if search is None or search.is_ignored:
-            msg.token = None
-            return
+            if search is None or search.is_ignored:
+                msg.token = None
+                return
 
-        username = msg.init.target_user
-        ip_address = msg.init.addr[0]
+            username = msg.init.target_user
+            ip_address = msg.init.addr[0]
 
-        if core.network_filter.is_user_ignored(username):
-            msg.token = None
-            return
+            if core.network_filter.is_user_ignored(username):
+                msg.token = None
+                return
 
-        if core.network_filter.is_user_ip_ignored(username, ip_address):
-            msg.token = None
+            if core.network_filter.is_user_ip_ignored(username, ip_address):
+                msg.token = None
 
     def _file_search_request_server(self, msg):
         """ Server code: 26, 42 and 120 """
